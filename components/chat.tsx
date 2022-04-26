@@ -15,7 +15,7 @@ interface message {
 export default function ChatPage() {
   const [message, setMessage] = React.useState("");
 
-  const [username, setUsername] = React.useState("Marcelo");
+  const [username, setUsername] = React.useState("MarceloArraes");
 
   const [messages, setMessages] = useState<Array<message>>([]);
 
@@ -24,7 +24,7 @@ export default function ChatPage() {
       .from("mensagens")
       .on("INSERT", (data: { new: any }) => {
         console.log("mensagem inserida");
-        //setMessages((messages) => [...messages, data.new]);
+        setMessages((messages) => [...messages, data.new]);
       })
       .subscribe();
   }
@@ -37,7 +37,7 @@ export default function ChatPage() {
       .match({ id: MessageToDelete.id })
       .then((result: any) => {
         console.log("Message deleted:", result);
-        //setMessages(messages.filter((m) => m.id !== MessageToDelete.id));
+        setMessages(messages.filter((m) => m.id !== MessageToDelete.id));
       });
   }
 
@@ -47,7 +47,9 @@ export default function ChatPage() {
       .select("*")
       .then((result) => {
         console.log(result);
-        //setMessages(result.data);
+        console.log(typeof result);
+
+        setMessages(result.data as Array<message>);
       });
 
     updateMessagesRealTime();
@@ -101,7 +103,7 @@ export default function ChatPage() {
                 "
       >
         <div
-          className=""
+          className="relative flex h-3/4 flex-col p-5 rounded bg-gray-200"
           /* position: 'relative',
                         flex,
                         flex: 1,
@@ -118,8 +120,8 @@ export default function ChatPage() {
             <input
               placeholder="Insira sua mensagem aqui..."
               type="textarea"
-              className="w-full rounded-sm p-2 bg-gray-700 m-10 text-gray-300"
-              /* className="w-full border-none resize-none rounded-sm p-2 bg-gray-700 mr-3 text-gray-300" */
+              //className="w-full rounded-sm p-2 bg-gray-700 m-10 text-gray-300"
+              className="w-full border-none resize-none rounded-sm p-2 bg-gray-700 mr-3 text-gray-300"
               /* width: '100%',
                                 border: '0',
                                 resize: 'none',
@@ -171,49 +173,40 @@ function MessageList({
         >
           <div className="mb-2">
             <img
-              className="
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            display: 'inline-block',
-                            marginRight: '8px',
-                        "
+              className=" w-12 h-12 rounded-full mr-2"
               src={`https://github.com/${mensagem.de}.png`}
             />
             <div className="strong">{mensagem.de}</div>
-            {/*         <Icon
-                    className="deletemessage"
-                    label="Icon Component"
-                    name="FaRegWindowClose"
-                    className="
-                      color: 'currentColor',
-                      cursor: 'pointer',
-                      fontSize: '1.5rem',
-                      float: 'right',
+            <img
+              src="https://img.icons8.com/color/48/000000/delete-forever.png"
+              className=" float-right
+                    cursor-pointer
+                    w-8 h-8
+                    ml-2
                     "
-                    onClick={() => {
-                        console.log('clicked');
-                        deleteMessage(mensagem);
-                    
-                  /> */}
+              onClick={() => {
+                console.log("clicked");
+                deleteMessage(mensagem);
+              }}
+            />
             <span
-              className="fontSize: '10px',
+              className="text-xs ml-2 text-gray-500"
+
+              /* fontSize: '10px',
                             marginLeft: '8px',
-                            color: appConfig.theme.colors.neutrals[300],
-                        "
+                            color: appConfig.theme.colors.neutrals[300], */
             >
               {new Date().toLocaleDateString()}
             </span>
           </div>
+          {mensagem.texto}
         </div>
       );
     });
+
   return (
     <div
-      className="ul
-                overflow: 'scroll'
-                flex,
-                flexDirection: 'column-reverse'
+      className="flex max-h-80 flex-col-reverse list-disc overflow-scroll
                 mb-4"
     >
       {messages}
