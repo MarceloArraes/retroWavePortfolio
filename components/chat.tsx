@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, PostgrestResponse } from "@supabase/supabase-js";
 
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_KEY as string;
 const SUPABASE_URL = "https://kapjhvjdbaxlvwkmkmwe.supabase.co";
@@ -9,10 +9,10 @@ interface message {
   id: React.Key;
   de: string;
   texto?: string;
-  created_at: string;
+  created_at: Date;
 }
 
-export default function ChatPage() {
+export default function ChatPage(): JSX.Element {
   const [message, setMessage] = React.useState("");
 
   const [username, setUsername] = React.useState("MarceloArraes");
@@ -35,7 +35,7 @@ export default function ChatPage() {
       .from("mensagens")
       .delete()
       .match({ id: MessageToDelete.id })
-      .then((result: any) => {
+      .then((result: PostgrestResponse<any>) => {
         console.log("Message deleted:", result);
         setMessages(messages.filter((m) => m.id !== MessageToDelete.id));
       });
@@ -47,8 +47,14 @@ export default function ChatPage() {
       .select("*")
       .then((result) => {
         console.log(result);
-        console.log(typeof result);
-
+        console.log("first useEffect");
+        if (result.data) {
+          console.log("result.data.created_at ", result.data[0].created_at);
+          console.log(
+            "type of result.data[0].created_at",
+            typeof result.data[0].created_at
+          );
+        }
         setMessages(result.data as Array<message>);
       });
 
@@ -70,6 +76,7 @@ export default function ChatPage() {
         .insert([mensagem])
         .then((result: any) => {
           console.log(result);
+          //no longer necessary because there is a subscription on the updateMessagesRealTime function that updates the messages array
           //setMessages([...messages, result.data[0]]);
         });
 
@@ -79,58 +86,16 @@ export default function ChatPage() {
   }
 
   return (
-    <div
-      className="
-                flex, alignItems: 'center', justifyContent: 'center',
-                backgroundColor: appConfig.theme.colors.primary[500],
-                backgroundImage: `url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)`,
-                backgroundRepeat: 'no-repeat', backgroundSize: 'cover', backgroundBlendMode: 'multiply',
-                color: appConfig.theme.colors.neutrals['000']
-            "
-    >
-      <div
-        className="
-                    flex,
-                    flexDirection: 'column',
-                    flex: 1,
-                    divShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-                    borderRadius: '5px',
-                    backgroundColor: appConfig.theme.colors.neutrals[700],
-                    height: '100%',
-                    maxWidth: '95%',
-                    maxHeight: '95vh',
-                    padding: '32px',
-                "
-      >
-        <div
-          className="relative flex h-3/4 flex-col p-5 rounded bg-gray-200"
-          /* position: 'relative',
-                        flex,
-                        flex: 1,
-                        height: '80%',
-                        backgroundColor: appConfig.theme.colors.neutrals[600],
-                        flexDirection: 'column',
-                        borderRadius: '5px',
-                        padding: '16px',
-                    " */
-        >
+    <div className="flex items-center justify-center bg-gray-500 h-full ">
+      <div className="flex flex-col rounded bg-gray-700 max-w-[95%] p-6">
+        <div className="relative flex h-3/4 flex-col p-5 rounded bg-gray-200">
           <MessageList mensagens={messages} deleteMessage={deleteMessage} />
 
           <form className="flex items-center">
             <input
               placeholder="Insira sua mensagem aqui..."
               type="textarea"
-              //className="w-full rounded-sm p-2 bg-gray-700 m-10 text-gray-300"
               className="w-full border-none resize-none rounded-sm p-2 bg-gray-700 mr-3 text-gray-300"
-              /* width: '100%',
-                                border: '0',
-                                resize: 'none',
-                                borderRadius: '5px',
-                                padding: '6px 8px',
-                                backgroundColor: appConfig.theme.colors.neutrals[800],
-                                marginRight: '12px',
-                                color: appConfig.theme.colors.neutrals[200],
-                            " */
               value={message}
               onKeyPress={(e) => {
                 handleMessageInput(e);
@@ -166,20 +131,23 @@ function MessageList({
         <div
           key={mensagem.id}
           className="rounded
-                    p-1.5
+                    p-3
                     mb-3
-                    hover: bg-gray-500
+                    bg-gray-300
+                    hover:bg-gray-500
                 "
         >
-          <div className="mb-2">
+          <div className="relative">
             <img
-              className=" w-12 h-12 rounded-full mr-2"
-              src={`https://github.com/${mensagem.de}.png`}
+              className="absolute w-12 h-12 rounded-full mr-2"
+              /* src={`https://github.com/${mensagem.de}.png`} */
+              /* src="https://picsum.photos/200?random=1" */
+              src="/synthGlasses.png"
             />
-            <div className="strong">{mensagem.de}</div>
+            {/* <div className="relative strong">{mensagem.de}</div> */}
             <img
               src="https://img.icons8.com/color/48/000000/delete-forever.png"
-              className=" float-right
+              className="float-right absolute right-0
                     cursor-pointer
                     w-8 h-8
                     ml-2
@@ -189,17 +157,11 @@ function MessageList({
                 deleteMessage(mensagem);
               }}
             />
-            <span
-              className="text-xs ml-2 text-gray-500"
-
-              /* fontSize: '10px',
-                            marginLeft: '8px',
-                            color: appConfig.theme.colors.neutrals[300], */
-            >
-              {new Date().toLocaleDateString()}
+            <span className="text-xs text-gray-800">
+              {new Date(mensagem.created_at).toDateString()}
             </span>
           </div>
-          {mensagem.texto}
+          <span className="relative flex-wrap">{mensagem.texto}</span>
         </div>
       );
     });
