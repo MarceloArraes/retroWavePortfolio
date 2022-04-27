@@ -87,7 +87,7 @@ export default function ChatPage(): JSX.Element {
 
   return (
     <div className="flex items-center justify-center bg-gray-500 h-full ">
-      <div className="flex flex-col rounded bg-gray-700 max-w-[95%] p-6">
+      <div className="flex flex-col rounded bg-gray-700 sm:max-w-[65%] sm:p-6">
         <div className="relative flex h-3/4 flex-col p-5 rounded bg-gray-200">
           <MessageList mensagens={messages} deleteMessage={deleteMessage} />
 
@@ -130,7 +130,7 @@ function MessageList({
       return (
         <div
           key={mensagem.id}
-          className="rounded
+          className="flex-col rounded
                     p-3
                     mb-3
                     bg-gray-300
@@ -139,7 +139,7 @@ function MessageList({
         >
           <div className="relative">
             <img
-              className="absolute w-12 h-12 rounded-full mr-2"
+              className="flex w-12 h-12 rounded-full mr-2"
               /* src={`https://github.com/${mensagem.de}.png`} */
               /* src="https://picsum.photos/200?random=1" */
               src="/synthGlasses.png"
@@ -147,7 +147,7 @@ function MessageList({
             {/* <div className="relative strong">{mensagem.de}</div> */}
             <img
               src="https://img.icons8.com/color/48/000000/delete-forever.png"
-              className="float-right absolute right-0
+              className="float-right absolute right-0 top-0
                     cursor-pointer
                     w-8 h-8
                     ml-2
@@ -157,11 +157,11 @@ function MessageList({
                 deleteMessage(mensagem);
               }}
             />
-            <span className="text-xs text-gray-800">
+            <span className="absolute text-xs text-gray-800 top-0">
               {new Date(mensagem.created_at).toDateString()}
             </span>
           </div>
-          <span className="relative flex-wrap">{mensagem.texto}</span>
+          <div className="break-all">{mensagem.texto}</div>
         </div>
       );
     });
