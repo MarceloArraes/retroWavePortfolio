@@ -88,14 +88,14 @@ export default function ChatPage(): JSX.Element {
   return (
     <div className="flex items-center justify-center bg-gray-500 h-full ">
       <div className="flex flex-col rounded bg-gray-700 sm:max-w-[65%] sm:p-6">
-        <div className="relative flex h-3/4 flex-col p-5 rounded bg-gray-200">
+        <div className="relative flex h-3/4 flex-col p-5 rounded bg-gray-800">
           <MessageList mensagens={messages} deleteMessage={deleteMessage} />
 
           <form className="flex items-center">
             <input
               placeholder="Insira sua mensagem aqui..."
               type="textarea"
-              className="w-full border-none resize-none rounded-sm p-2 bg-gray-700 mr-3 text-gray-300"
+              className="w-full  resize-none rounded-sm p-2 bg-gray-700  text-gray-300"
               value={message}
               onKeyPress={(e) => {
                 handleMessageInput(e);
@@ -130,16 +130,16 @@ function MessageList({
       return (
         <div
           key={mensagem.id}
-          className="flex-col rounded
+          className="rounded
                     p-3
                     mb-3
                     bg-gray-300
                     hover:bg-gray-500
                 "
         >
-          <div className="relative">
+          <div className="relative ">
             <img
-              className="flex w-12 h-12 rounded-full mr-2"
+              className="w-12 h-12 rounded-full mr-2 "
               /* src={`https://github.com/${mensagem.de}.png`} */
               /* src="https://picsum.photos/200?random=1" */
               src="/synthGlasses.png"
@@ -157,11 +157,11 @@ function MessageList({
                 deleteMessage(mensagem);
               }}
             />
-            <span className="absolute text-xs text-gray-800 top-0">
+            <span className="absolute text-xs text-gray-800 top-0 ml-[45%]">
               {new Date(mensagem.created_at).toDateString()}
             </span>
+            <div className="break-all ml-[25%]">{mensagem.texto}</div>
           </div>
-          <div className="break-all">{mensagem.texto}</div>
         </div>
       );
     });
